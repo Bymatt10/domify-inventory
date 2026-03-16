@@ -30,6 +30,9 @@ pipeline {
                     // Detiene y elimina contenedores anteriores del mismo proyecto
                     sh "${dockerCmd} down --remove-orphans"
                     sh "${dockerCmd} up -d --build"
+                    // Ejecutar migraciones y recolectar archivos estáticos
+                    sh "${dockerCmd} exec -T web python manage.py migrate --noinput"
+                    sh "${dockerCmd} exec -T web python manage.py collectstatic --noinput"
                 }
             }
         }
