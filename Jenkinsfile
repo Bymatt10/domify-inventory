@@ -25,7 +25,9 @@ pipeline {
                 script {
                     // Intenta usar 'docker compose' y si falla usa 'docker-compose'
                     def dockerCmd = sh(script: "docker compose version", returnStatus: true) == 0 ? "docker compose" : "docker-compose"
-                    // Detiene y elimina contenedores anteriores para evitar conflictos de nombres
+                    // Elimina los contenedores forzosamente si quedaron "huérfanos" o en uso por otro proceso
+                    sh 'docker rm -f inventory_db inventory_web || true'
+                    // Detiene y elimina contenedores anteriores del mismo proyecto
                     sh "${dockerCmd} down --remove-orphans"
                     sh "${dockerCmd} up -d --build"
                 }
