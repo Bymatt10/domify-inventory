@@ -9,6 +9,8 @@ media
 static
 venv_inv/
 .env
+.env.example
 .idea/
 .vscode/
 .DS_Store
+.xlsx
