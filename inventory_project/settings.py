@@ -31,6 +31,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://inventario.domify.app',
+    'http://inventario.domify.app',
+]
+
+# Necesario para manejar HTTPS detrás de un proxy (Nginx Proxy Manager)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 
 # Application definition
 
