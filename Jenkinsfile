@@ -36,7 +36,10 @@ pipeline {
         
         stage('Verificar Estado') {
             steps {
-                sh 'docker ps | grep inventory_web'
+                // Espera unos segundos para que los contenedores terminen de arrancar
+                sh 'sleep 5'
+                sh 'docker ps'
+                sh 'docker logs inventory_web --tail 20 || true'
             }
         }
     }
