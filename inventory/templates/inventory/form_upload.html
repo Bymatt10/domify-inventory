@@ -1,0 +1,23 @@
+{% extends 'inventory/form_category.html' %}
+
+{% block content %}
+<div class="glass-form-container">
+    <h2 class="form-title">{{ title }}</h2>
+    <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.archivo_excel.id_for_label }}">{{ form.archivo_excel.label }}</label>
+            {{ form.archivo_excel }}
+            <span class="help-text">{{ form.archivo_excel.help_text }}</span>
+            {% if form.archivo_excel.errors %}
+                <span class="error-msg">{{ form.archivo_excel.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn-primary" style="background-color: #10B981;">
+            <i class="fa-solid fa-upload"></i> Cargar Datos
+        </button>
+    </form>
+</div>
+{% endblock %}

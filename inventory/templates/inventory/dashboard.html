@@ -1,0 +1,155 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Dashboard | InvSystem{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .dashboard-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .kpi-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.5);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    .kpi-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    .kpi-primary .kpi-icon { background-color: rgba(79, 70, 229, 0.1); color: var(--primary); }
+    .kpi-success .kpi-icon { background-color: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+    .kpi-danger .kpi-icon { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+    
+    .kpi-details h3 {
+        font-size: 0.875rem;
+        color: var(--gray-800);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+    }
+    .kpi-details p {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    .action-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        text-decoration: none;
+        color: var(--dark);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid var(--gray-200);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    .action-card i {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+    .action-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-3px);
+    }
+    .metrics-section {
+        margin-top: 3rem;
+    }
+    .section-title {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="dashboard-header">
+    <h1 class="dashboard-title">Resumen de Inventario</h1>
+</header>
+
+<div class="kpi-grid">
+    <div class="kpi-card kpi-primary">
+        <div class="kpi-icon"><i class="fa-solid fa-box-open"></i></div>
+        <div class="kpi-details">
+            <h3>Total Productos</h3>
+            <p>{{ total_productos }}</p>
+        </div>
+    </div>
+    <div class="kpi-card kpi-success">
+        <div class="kpi-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+        <div class="kpi-details">
+            <h3>Valor Total Inv.</h3>
+            <p>${{ valor_total|floatformat:2 }}</p>
+        </div>
+    </div>
+    <div class="kpi-card kpi-danger">
+        <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="kpi-details">
+            <h3>Avisos: Stock Bajo</h3>
+            <p>{{ stock_bajo_count }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="metrics-section">
+    <h2 class="section-title">Acciones Rápidas</h2>
+    <div class="action-grid">
+        <a href="{% url 'inventory:product_list' %}" class="action-card">
+            <i class="fa-solid fa-list-ul"></i>
+            <span>Ver Productos</span>
+        </a>
+        <a href="{% url 'inventory:add_product' %}" class="action-card">
+            <i class="fa-solid fa-plus"></i>
+            <span>Agregar Producto</span>
+        </a>
+        <a href="{% url 'inventory:export_excel' %}" class="action-card">
+            <i class="fa-solid fa-file-excel" style="color: #10B981;"></i>
+            <span>Generar Excel</span>
+        </a>
+        <a href="{% url 'inventory:export_pdf' %}" class="action-card">
+            <i class="fa-solid fa-file-pdf" style="color: #EF4444;"></i>
+            <span>Generar PDF</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

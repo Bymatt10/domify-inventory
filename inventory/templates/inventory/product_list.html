@@ -1,0 +1,211 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Productos | InvSystem{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.6);
+    }
+    .panel-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .panel-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+    .controls {
+        display: flex;
+        gap: 1rem;
+    }
+    .search-box {
+        position: relative;
+    }
+    .search-box input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 0.5rem;
+        outline: none;
+        width: 250px;
+        font-size: 0.875rem;
+        transition: border-color 0.3s ease;
+    }
+    .search-box input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    .search-box i {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-800);
+        opacity: 0.5;
+    }
+    .filter-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 0.5rem;
+        outline: none;
+        font-size: 0.875rem;
+        background-color: var(--white);
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    th {
+        background-color: rgba(243, 244, 246, 0.5);
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.875rem;
+        color: var(--dark);
+    }
+    tbody tr:hover { background-color: rgba(79, 70, 229, 0.02); }
+    .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-success { background-color: #D1FAE5; color: #065F46; }
+    .badge-warning { background-color: #FEF3C7; color: #92400E; }
+    .badge-danger { background-color: #FEE2E2; color: #991B1B; }
+    .price-col { font-weight: 600; color: var(--secondary); }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        padding: 1.5rem;
+        gap: 0.5rem;
+    }
+    .page-link {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 0.5rem;
+        color: var(--dark);
+        text-decoration: none;
+        transition: all 0.2s;
+        background: var(--white);
+    }
+    .page-link:hover {
+        background: var(--gray-100);
+    }
+    .page-link.active {
+        background: var(--primary);
+        color: var(--white);
+        border-color: var(--primary);
+    }
+    .btn-submit {
+        padding: 0.5rem 1rem;
+        background-color: var(--primary);
+        color: var(--white);
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">Lista de Productos</h2>
+        <form method="GET" class="controls">
+            <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Buscar por código o nombre...">
+            </div>
+            <select name="categoria" class="filter-select" onchange="this.form.submit()">
+                <option value="">Todas las Categorías</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat.nombre }}" {% if category_filter == cat.nombre %}selected{% endif %}>{{ cat.nombre }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-submit">Buscar</button>
+        </form>
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Marca</th>
+                    <th>P. Compra</th>
+                    <th>P. Venta</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in page_obj %}
+                <tr>
+                    <td>{{ p.codigo }}</td>
+                    <td>{{ p.nombre }}</td>
+                    <td>{{ p.categoria.nombre|default:"N/A" }}</td>
+                    <td>{{ p.marca }}</td>
+                    <td>${{ p.precio_compra }}</td>
+                    <td class="price-col">${{ p.precio_venta }}</td>
+                    <td>{{ p.stock }}</td>
+                    <td>
+                        {% if p.stock > p.stock_minimo %}
+                            <span class="badge badge-success">OK</span>
+                        {% elif p.stock > 0 %}
+                            <span class="badge badge-warning">Bajo</span>
+                        {% else %}
+                            <span class="badge badge-danger">Agotado</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" style="text-align:center;">No hay productos disponibles.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1&search={{ search_query }}&categoria={{ category_filter }}" class="page-link">&laquo; Primero</a>
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&categoria={{ category_filter }}" class="page-link">Anterior</a>
+        {% endif %}
+
+        <span class="page-link active">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&categoria={{ category_filter }}" class="page-link">Siguiente</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}&categoria={{ category_filter }}" class="page-link">Último &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
